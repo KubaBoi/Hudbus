@@ -26,7 +26,7 @@ jobs:
           output=$(python3 .github/promote.py ${{ github.event.commits[0].message }})
           echo "::set-output name=commitMessage::$output"
 
-        - name: Build android html
+      - name: Build android html
         run: python3 .github/buildHtml.py
 
       - name: commit files
