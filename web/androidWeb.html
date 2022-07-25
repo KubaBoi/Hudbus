@@ -59,99 +59,40 @@ body {
             audio.play();
         }
         
+/* songLoader.js */
+
+
+async function loadSongs() {
+    var response = await callEndpoint("GET", serverUrl + "/songs/getAll");
+    if (response.ERROR == null) {
+        let songs = response.SONGS;
+        let tbl = document.getElementById("songTable");
+        clearTable(tbl);
+
+        for (let i = 0; i < songs.length; i++) {
+            addRow(tbl, [
+                {"text": songs[i], "attributes": [{"name": "onclick", "value": `play("${serverUrl}/songs/${songs[i]}")`}]}
+            ]);
+        }
+    }
+    else {
+        alert(response.ERROR);
+    }
+}
+
 /* start.js */
 
 var serverUrl = "http://192.168.0.108:8010"
 
+loadSongs();
 
-/* time.js */
+/* player.js */
 
-function nowTime() {
-    var now = new Date();
-    var date = new Date(now.getTime());
 
-    var hours = date.getHours();
-    var minutes = "0" + date.getMinutes();
-    var seconds = "0" + date.getSeconds();
-
-    return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-
-}
-
-function getTimestamp(strTime=null, nullIsNow=true) {
-    if (strTime == "") strTime = null;
-    if (!nullIsNow && strTime == null) {
-        return "";
-    }
-    return new Date(strTime).toISOString().slice(0,16);
-}
-
-/**
- * @deprecated Use getTimestamp. getTime will return only time part of date since CheeseFramework 1.4.0
- */
-function getTime(strTime=null, nullIsNow=true) {
-    console.warn(`WARNING! Obsolete function called. Function getTime() has been deprecated, 
-please use the new getTimestamp() function instead! Function will return time part of datetime stamp since 1.4.0`);
-
-    if (strTime == "") strTime = null;
-    if (!nullIsNow && strTime == null) {
-        return null;
-    }
-    return new Date(strTime).toISOString().slice(0,16);
-    //return new Date(strTime).toISOString().slice(10,16);
-}
-
-function getDate(strTime=null, nullIsNow=true) {
-    if (strTime == "") strTime = null;
-    if (!nullIsNow && strTime == null) {
-        return null;
-    }
-    return new Date(strTime).toISOString().substring(0,10);
-}
-
-function formatTime(rootSeconds) {
-    var hours   = Math.floor(rootSeconds / 3600);
-    var minutes = Math.floor((rootSeconds - (hours * 3600)) / 60);
-    var seconds = rootSeconds - (hours * 3600) - (minutes * 60);
-
-    str = "";
-    if (hours > 0) str += `${hours}h`;
-    if (minutes > 0) str += ` ${minutes}m`;
-    if (seconds > 0) str += ` ${seconds}s`;
-    return str;
-}
-
-function formatDatetime(datetime, includeSeconds=true) {
-
-    let year = datetime.getFullYear();
-    let date = datetime.getDate();
-    let month = datetime.getMonth();
-
-    let hours = datetime.getHours();
-    let minutes = datetime.getMinutes();
-    let seconds = datetime.getSeconds();
-
-    if (`${minutes}`.length == 1) minutes = `0${minutes}`;
-    if (`${seconds}`.length == 1) seconds = `0${seconds}`;
-
-    let dateString = `${date}.${month}.${year} ${hours}:${minutes}`;
-    if (includeSeconds) {
-        dateString += `:${seconds}`;
-    }
-    return dateString;
-}
-
-function formatDate(datetime, includeYear=true) {
-
-    let year = datetime.getFullYear();
-    let date = datetime.getDate();
-    let month = datetime.getMonth();
-
-    let dateString = `${date}.${month}`;
-    if (includeYear) {
-        dateString += `.${year}`;
-    }
-    return dateString;
+function play(path) {
+    const audio = new Audio(path);
+    audio.load();
+    audio.play();
 }
 
 // AUTOCOMPLETE.JS
@@ -281,7 +222,6 @@ function clickTest(type, func) {
     }
 }
 
-<<<<<<< HEAD
 function singleClickDone(wanted, func) {
     if (wanted) func();
 
@@ -319,9 +259,6 @@ function addHeader(table, cells, rowAttributes=[]) {
     }
     return row;
 }
-=======
-/* time.js */
->>>>>>> dbb0bbe4231fc5edc65e63f77258f4be3a990a7f
 
 function insertRow(table, rowIndex, cells, rowAttributes=[]) {
     var row = table.insertRow(rowIndex);
@@ -568,7 +505,6 @@ function formatDate(datetime, includeYear=true) {
     return dateString;
 }
 
-<<<<<<< HEAD
 
 // COMMUNICATION.JS
 
@@ -780,11 +716,6 @@ Prism.languages.json={property:{pattern:/(^|[^\\])"(?:\\.|[^\\"\r\n])*"(?=\s*:)/
 Prism.languages.powerquery={comment:{pattern:/(^|[^\\])(?:\/\*[\s\S]*?\*\/|\/\/.*)/,lookbehind:!0,greedy:!0},"quoted-identifier":{pattern:/#"(?:[^"\r\n]|"")*"(?!")/,greedy:!0},string:{pattern:/(?:#!)?"(?:[^"\r\n]|"")*"(?!")/,greedy:!0},constant:[/\bDay\.(?:Friday|Monday|Saturday|Sunday|Thursday|Tuesday|Wednesday)\b/,/\bTraceLevel\.(?:Critical|Error|Information|Verbose|Warning)\b/,/\bOccurrence\.(?:All|First|Last)\b/,/\bOrder\.(?:Ascending|Descending)\b/,/\bRoundingMode\.(?:AwayFromZero|Down|ToEven|TowardZero|Up)\b/,/\bMissingField\.(?:Error|Ignore|UseNull)\b/,/\bQuoteStyle\.(?:Csv|None)\b/,/\bJoinKind\.(?:FullOuter|Inner|LeftAnti|LeftOuter|RightAnti|RightOuter)\b/,/\bGroupKind\.(?:Global|Local)\b/,/\bExtraValues\.(?:Error|Ignore|List)\b/,/\bJoinAlgorithm\.(?:Dynamic|LeftHash|LeftIndex|PairwiseHash|RightHash|RightIndex|SortMerge)\b/,/\bJoinSide\.(?:Left|Right)\b/,/\bPrecision\.(?:Decimal|Double)\b/,/\bRelativePosition\.From(?:End|Start)\b/,/\bTextEncoding\.(?:Ascii|BigEndianUnicode|Unicode|Utf16|Utf8|Windows)\b/,/\b(?:Any|Binary|Date|DateTime|DateTimeZone|Duration|Function|Int16|Int32|Int64|Int8|List|Logical|None|Number|Record|Table|Text|Time)\.Type\b/,/\bnull\b/],boolean:/\b(?:false|true)\b/,keyword:/\b(?:and|as|each|else|error|if|in|is|let|meta|not|nullable|optional|or|otherwise|section|shared|then|try|type)\b|#(?:binary|date|datetime|datetimezone|duration|infinity|nan|sections|shared|table|time)\b/,function:{pattern:/(^|[^#\w.])[a-z_][\w.]*(?=\s*\()/i,lookbehind:!0},"data-type":{pattern:/\b(?:any|anynonnull|binary|date|datetime|datetimezone|duration|function|list|logical|none|number|record|table|text|time)\b/,alias:"class-name"},number:{pattern:/\b0x[\da-f]+\b|(?:[+-]?(?:\b\d+\.)?\b\d+|[+-]\.\d+|(^|[^.])\B\.\d+)(?:e[+-]?\d+)?\b/i,lookbehind:!0},operator:/[-+*\/&?@^]|<(?:=>?|>)?|>=?|=>?|\.\.\.?/,punctuation:/[,;\[\](){}]/},Prism.languages.pq=Prism.languages.powerquery,Prism.languages.mscript=Prism.languages.powerquery;
 Prism.languages.python={comment:{pattern:/(^|[^\\])#.*/,lookbehind:!0,greedy:!0},"string-interpolation":{pattern:/(?:f|fr|rf)(?:("""|''')[\s\S]*?\1|("|')(?:\\.|(?!\2)[^\\\r\n])*\2)/i,greedy:!0,inside:{interpolation:{pattern:/((?:^|[^{])(?:\{\{)*)\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}]|\{(?!\{)(?:[^{}])+\})+\})+\}/,lookbehind:!0,inside:{"format-spec":{pattern:/(:)[^:(){}]+(?=\}$)/,lookbehind:!0},"conversion-option":{pattern:/![sra](?=[:}]$)/,alias:"punctuation"},rest:null}},string:/[\s\S]+/}},"triple-quoted-string":{pattern:/(?:[rub]|br|rb)?("""|''')[\s\S]*?\1/i,greedy:!0,alias:"string"},string:{pattern:/(?:[rub]|br|rb)?("|')(?:\\.|(?!\1)[^\\\r\n])*\1/i,greedy:!0},function:{pattern:/((?:^|\s)def[ \t]+)[a-zA-Z_]\w*(?=\s*\()/g,lookbehind:!0},"class-name":{pattern:/(\bclass\s+)\w+/i,lookbehind:!0},decorator:{pattern:/(^[\t ]*)@\w+(?:\.\w+)*/m,lookbehind:!0,alias:["annotation","punctuation"],inside:{punctuation:/\./}},keyword:/\b(?:_(?=\s*:)|and|as|assert|async|await|break|case|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|match|nonlocal|not|or|pass|print|raise|return|try|while|with|yield)\b/,builtin:/\b(?:__import__|abs|all|any|apply|ascii|basestring|bin|bool|buffer|bytearray|bytes|callable|chr|classmethod|cmp|coerce|compile|complex|delattr|dict|dir|divmod|enumerate|eval|execfile|file|filter|float|format|frozenset|getattr|globals|hasattr|hash|help|hex|id|input|int|intern|isinstance|issubclass|iter|len|list|locals|long|map|max|memoryview|min|next|object|oct|open|ord|pow|property|range|raw_input|reduce|reload|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|unichr|unicode|vars|xrange|zip)\b/,boolean:/\b(?:False|None|True)\b/,number:/\b0(?:b(?:_?[01])+|o(?:_?[0-7])+|x(?:_?[a-f0-9])+)\b|(?:\b\d+(?:_\d+)*(?:\.(?:\d+(?:_\d+)*)?)?|\B\.\d+(?:_\d+)*)(?:e[+-]?\d+(?:_\d+)*)?j?(?!\w)/i,operator:/[-+%=]=?|!=|:=|\*\*?=?|\/\/?=?|<[<=>]?|>[=>]?|[&|^~]/,punctuation:/[{}[\];(),.:]/},Prism.languages.python["string-interpolation"].inside.interpolation.inside.rest=Prism.languages.python,Prism.languages.py=Prism.languages.python;
 
-=======
-/* start.js */
-
-var serverUrl = "http://192.168.0.108:8010"
->>>>>>> dbb0bbe4231fc5edc65e63f77258f4be3a990a7f
 
 
     </script>
