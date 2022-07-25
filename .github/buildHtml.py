@@ -1,4 +1,5 @@
 import os
+import requests
 
 settPath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "web"))
 serverUrl = "http://192.168.0.108:8010"
@@ -25,6 +26,11 @@ data = data[:startSTYLES] + data[endSTYLES + len("<!-- END STYLES -->"):]
 
 scripts = prepareFiles()
 styles = prepareFiles(".css")
+
+req = requests.get("https://raw.githubusercontent.com/KubaBoi/CheeseFramework/webServices/public/scripts/cheese.js")
+if (req.status_code != 200):
+    raise Exception("Cannot load cheese.js")
+scripts += req.text
 
 data = data.replace("/*$SCRIPTS$*/", scripts)
 data = data.replace("/*$STYLES$*/", styles)
