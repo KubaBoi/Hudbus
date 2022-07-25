@@ -20,6 +20,10 @@ jobs:
         with:
           python-version: '3.9' # install the python version needed
 
+      - name: Install dependecies
+        run: |
+          python3 -m pip install --upgrade requests
+
       - name: Promote version
         id: promoteStep
         run: |
