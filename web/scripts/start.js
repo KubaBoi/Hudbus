@@ -1,3 +1,1 @@
-function ou() {
-    console.log("ou");
-}
+var serverUrl = "";

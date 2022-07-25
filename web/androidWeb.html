@@ -11,16 +11,6 @@
 
 <style>
     
-/* style.css */
-
-body {
-    color: var(--main-text-color);
-    background-color: var(--main-color);
-    font-family: Arial, Helvetica, sans-serif;
-    overflow-x: hidden;
-    overflow-y: hidden;
-}
-
 /* color.css */
 
 :root {
@@ -45,6 +35,16 @@ body {
     --need-visa: #9e3a3a;
 }
 
+/* style.css */
+
+body {
+    color: var(--main-text-color);
+    background-color: var(--main-color);
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
 </style>
 
 <body>
@@ -59,10 +59,172 @@ body {
             audio.play();
         }
         
+/* communication.js */
+
+var debug = true;
+var authorization = "";
+function sendPost(url, jsonRequest, output, callback) {
+    var xmlHttp = new XMLHttpRequest(); 
+
+    if (output) console.log("SENDING", nowTime(), url, jsonRequest);
+
+    xmlHttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+            json = JSON.parse(this.responseText);
+            if(output) console.log("RESPONSE", nowTime(), url, json);
+            if(callback) callback(json);
+        }
+    };
+    xmlHttp.open("POST", url);
+    xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    if (authorization != "") {
+        xmlHttp.setRequestHeader("Authorization", window.btoa(authorization));
+    }
+    xmlHttp.send(jsonRequest);
+}
+
+function sendGet(url, output, callback) {
+    var xmlHttp = new XMLHttpRequest();
+
+    if (output) console.log("SENDING", nowTime(), url);
+
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4) {
+            try {
+                json = JSON.parse(this.responseText);
+            }
+            catch {
+                json = this.responseText;
+            }
+            if(output) console.log("RESPONSE", nowTime(), url, json);
+            if(callback) callback(json);
+        }
+    }
+    xmlHttp.open("GET", url); 
+    xmlHttp.setRequestHeader("Content-Type", "text/plain;charset=UTF-8;");
+    if (authorization != "") {
+        xmlHttp.setRequestHeader("Authorization", window.btoa(authorization));
+    }
+    xmlHttp.send();
+}
+
+function callEndpoint(type, url, request=null) {
+    url = serverUrl + url;
+
+    if (type == "GET") {
+        return new Promise(resolve => {
+            sendGet(url, debug, function(response) {
+                resolve(response);
+            });
+        });
+    } else if (type == "POST") {
+        var request = JSON.stringify(request);
+        return new Promise(resolve => {
+            sendPost(url, request, debug, function(response) {
+                resolve(response);
+            });
+        });
+    }
+    else {
+        console.log("Unknown type (Had to be GET or POST");
+        console.log(type);
+        return null;
+    }
+}
+
 /* start.js */
 
-function ou() {
-    console.log("ou");
+var serverUrl = "http://192.168.0.108:8010"
+
+
+/* time.js */
+
+function nowTime() {
+    var now = new Date();
+    var date = new Date(now.getTime());
+
+    var hours = date.getHours();
+    var minutes = "0" + date.getMinutes();
+    var seconds = "0" + date.getSeconds();
+
+    return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+
+}
+
+function getTimestamp(strTime=null, nullIsNow=true) {
+    if (strTime == "") strTime = null;
+    if (!nullIsNow && strTime == null) {
+        return "";
+    }
+    return new Date(strTime).toISOString().slice(0,16);
+}
+
+/**
+ * @deprecated Use getTimestamp. getTime will return only time part of date since CheeseFramework 1.4.0
+ */
+function getTime(strTime=null, nullIsNow=true) {
+    console.warn(`WARNING! Obsolete function called. Function getTime() has been deprecated, 
+please use the new getTimestamp() function instead! Function will return time part of datetime stamp since 1.4.0`);
+
+    if (strTime == "") strTime = null;
+    if (!nullIsNow && strTime == null) {
+        return null;
+    }
+    return new Date(strTime).toISOString().slice(0,16);
+    //return new Date(strTime).toISOString().slice(10,16);
+}
+
+function getDate(strTime=null, nullIsNow=true) {
+    if (strTime == "") strTime = null;
+    if (!nullIsNow && strTime == null) {
+        return null;
+    }
+    return new Date(strTime).toISOString().substring(0,10);
+}
+
+function formatTime(rootSeconds) {
+    var hours   = Math.floor(rootSeconds / 3600);
+    var minutes = Math.floor((rootSeconds - (hours * 3600)) / 60);
+    var seconds = rootSeconds - (hours * 3600) - (minutes * 60);
+
+    str = "";
+    if (hours > 0) str += `${hours}h`;
+    if (minutes > 0) str += ` ${minutes}m`;
+    if (seconds > 0) str += ` ${seconds}s`;
+    return str;
+}
+
+function formatDatetime(datetime, includeSeconds=true) {
+
+    let year = datetime.getFullYear();
+    let date = datetime.getDate();
+    let month = datetime.getMonth();
+
+    let hours = datetime.getHours();
+    let minutes = datetime.getMinutes();
+    let seconds = datetime.getSeconds();
+
+    if (`${minutes}`.length == 1) minutes = `0${minutes}`;
+    if (`${seconds}`.length == 1) seconds = `0${seconds}`;
+
+    let dateString = `${date}.${month}.${year} ${hours}:${minutes}`;
+    if (includeSeconds) {
+        dateString += `:${seconds}`;
+    }
+    return dateString;
+}
+
+function formatDate(datetime, includeYear=true) {
+
+    let year = datetime.getFullYear();
+    let date = datetime.getDate();
+    let month = datetime.getMonth();
+
+    let dateString = `${date}.${month}`;
+    if (includeYear) {
+        dateString += `.${year}`;
+    }
+    return dateString;
 }
 
     </script>

@@ -1,6 +1,7 @@
 import os
 
 settPath = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "web"))
+serverUrl = "http://192.168.0.108:8010"
 
 def prepareFiles(reg=".js"):
     filesString = ""
@@ -27,6 +28,7 @@ styles = prepareFiles(".css")
 
 data = data.replace("/*$SCRIPTS$*/", scripts)
 data = data.replace("/*$STYLES$*/", styles)
+data = data.replace("var serverUrl = \"\";", f"var serverUrl = \"{serverUrl}\"")
 
 with open(os.path.join(settPath, "androidWeb.html"), "w") as f:
     f.write(data)
