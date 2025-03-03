@@ -1,6 +1,9 @@
+var audioPlayer = null;
 
 function play(path) {
-    const audio = new Audio(path);
-    audio.load();
-    audio.play();
+    if (audioPlayer == null) {
+        audioPlayer = new Audio(path);
+        audioPlayer.load();
+    }
+    audioPlayer.play();
 }

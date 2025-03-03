@@ -11,16 +11,6 @@
 
 <style>
     
-/* style.css */
-
-body {
-    color: var(--main-text-color);
-    background-color: var(--main-color);
-    font-family: Arial, Helvetica, sans-serif;
-    overflow-x: hidden;
-    overflow-y: hidden;
-}
-
 /* color.css */
 
 :root {
@@ -45,6 +35,16 @@ body {
     --need-visa: #9e3a3a;
 }
 
+/* style.css */
+
+body {
+    color: var(--main-text-color);
+    background-color: var(--main-color);
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
 </style>
 
 <body>
@@ -59,6 +59,18 @@ body {
             audio.play();
         }
         
+/* player.js */
+
+var audioPlayer = null;
+
+function play(path) {
+    if (audioPlayer == null) {
+        audioPlayer = new Audio(path);
+        audioPlayer.load();
+    }
+    audioPlayer.play();
+}
+
 /* songLoader.js */
 
 
@@ -85,15 +97,6 @@ async function loadSongs() {
 var serverUrl = "http://192.168.0.108:8010"
 
 loadSongs();
-
-/* player.js */
-
-
-function play(path) {
-    const audio = new Audio(path);
-    audio.load();
-    audio.play();
-}
 
 // AUTOCOMPLETE.JS
 var currentFocus;
